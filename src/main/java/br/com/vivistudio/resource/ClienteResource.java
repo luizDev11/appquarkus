@@ -1,5 +1,6 @@
 package br.com.vivistudio.resource;
 
+import br.com.vivistudio.entity.Agendamento;
 import jakarta.transaction.Transactional;
 import br.com.vivistudio.entity.Cliente;
 import jakarta.ws.rs.*;
@@ -28,7 +29,6 @@ public class ClienteResource {
 
     @POST
     @Transactional
-    @Path("/criar")
     public Response criarCliente(Cliente cliente) {
 
         if (cliente.nome == null || cliente.telefone == null) {
@@ -68,13 +68,24 @@ public class ClienteResource {
     @Transactional
     @Path("/{id}")
     public Response deletarCliente(@PathParam("id") Long id) {
-        boolean deletado = Cliente.deleteById(id);
 
-        if (!deletado) {
+        Cliente cliente = Cliente.findById(id);
+
+        if (cliente == null) {
             return Response.status(Response.Status.NOT_FOUND)
                     .entity("Cliente não encontrado")
                     .build();
         }
+
+        List<Agendamento> agendamentos = Agendamento.list("cliente.id", id);
+
+        for (Agendamento agendamento : agendamentos) {
+            agendamento.cliente = null;
+        }
+
+        Agendamento.getEntityManager().flush();
+
+        cliente.delete();
 
         return Response.noContent().build();
     }
