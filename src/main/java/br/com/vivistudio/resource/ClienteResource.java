@@ -27,6 +27,19 @@ public class ClienteResource {
         return Response.ok(cliente).build();
     }
 
+    @GET
+    @Path("/buscarPorTelefone")
+    public Response buscarPorTelefone(@QueryParam("telefone") String telefone) {
+        Cliente cliente = Cliente.find("telefone", telefone).firstResult();
+        if (cliente == null) {
+            return Response.status(Response.Status.NOT_FOUND)
+                    .entity("Cliente não encontrado")
+                    .build();
+        }
+        return Response.ok(cliente).build();
+    }
+
+
     @POST
     @Transactional
     public Response criarCliente(Cliente cliente) {
