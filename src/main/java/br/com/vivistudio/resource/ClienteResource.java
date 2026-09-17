@@ -17,6 +17,12 @@ public class ClienteResource {
     }
 
     @GET
+    @Path("/count")
+    public long getTotalClientes() {
+        return Cliente.count();
+    }
+
+    @GET
     @Path("/{id}")
     public Response buscarPorId(@PathParam("id") Long id) {
         Cliente cliente = Cliente.findById(id);

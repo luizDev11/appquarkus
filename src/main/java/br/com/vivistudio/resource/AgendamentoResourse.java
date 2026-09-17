@@ -1,11 +1,13 @@
 package br.com.vivistudio.resource;
 
+import br.com.vivistudio.entity.Servico;
 import br.com.vivistudio.entity.Agendamento;
 import br.com.vivistudio.entity.Cliente;
 import br.com.vivistudio.request.AgendamentoRequest;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.Response;
+
 
 import java.util.List;
 
@@ -31,6 +33,7 @@ public class AgendamentoResourse {
 
         return Response.ok(agendamento).build();
     }
+
     @GET
     @Path("/buscarPorTelefone")
     public Cliente buscarPorTelefone(@QueryParam("telefone") String telefone) {
@@ -41,10 +44,20 @@ public class AgendamentoResourse {
     @POST
     @Transactional
     public Response criarAgendamento(AgendamentoRequest request) {
+
         Cliente cliente = Cliente.find("telefone", request.getTelefone()).firstResult();
+
         if (cliente == null) {
             return Response.status(Response.Status.BAD_REQUEST)
                     .entity("Cliente não existe, não é possível agendar")
+                    .build();
+        }
+        Servico servico = Servico.findById(request.getServicoId());
+
+        // 4. Verificar se o serviço existe
+        if (servico == null) {
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .entity("Serviço não existe, não é possível agendar")
                     .build();
         }
 
@@ -52,7 +65,8 @@ public class AgendamentoResourse {
         agendamento.cliente = cliente;
         agendamento.data = request.getData();
         agendamento.hora = request.getHora();
-        agendamento.servico = request.getServico();
+        agendamento.servico = servico;
+        agendamento.valor = servico.valor;
         agendamento.persist();
 
         return Response.status(Response.Status.CREATED)
@@ -85,22 +99,20 @@ public class AgendamentoResourse {
     @DELETE
     @Transactional
     @Path("/{id}")
-    public Response deletarAgendamentoPorId (@PathParam("id") Long id) {
+    public Response deletarAgendamentoPorId(@PathParam("id") Long id) {
 
-       boolean deletado = Agendamento.deleteById(id);
+        boolean deletado = Agendamento.deleteById(id);
 
-       if(!deletado){
+        if (!deletado) {
 
-           return Response.status(Response.Status.NOT_FOUND)
-                   .entity("Agendamento não encontrado")
-                   .build();
-       }
-       return Response.noContent().build();
+            return Response.status(Response.Status.NOT_FOUND)
+                    .entity("Agendamento não encontrado")
+                    .build();
+        }
+        return Response.noContent().build();
 
 
     }
-
-
 
 
 }

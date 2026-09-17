@@ -8,7 +8,7 @@ public class AgendamentoRequest {
     private Long telefone;
     private LocalDate data;
     private LocalTime hora;
-    private String servico;
+    private Long servicoId;
 
     // Getters e Setters
     public Long getTelefone() { return telefone; }
@@ -20,6 +20,6 @@ public class AgendamentoRequest {
     public LocalTime getHora() { return hora; }
     public void setHora(LocalTime hora) { this.hora = hora; }
 
-    public String getServico() { return servico; }
-    public void setServico(String servico) { this.servico = servico; }
+    public Long getServicoId() { return servicoId; }
+    public void setServicoId(Long servicoId) { this.servicoId = servicoId; }
 }
