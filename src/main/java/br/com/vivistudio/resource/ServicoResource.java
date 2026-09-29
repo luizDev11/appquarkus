@@ -45,6 +45,16 @@ public class ServicoResource {
         return Response.ok(servico).build();
     }
 
+    @GET
+    @Path("/ativos")
+    public Response listarAtivos() {
+
+        List<Servico> servicos = Servico
+                .list("statusServico", StatusServico.ATIVO);
+
+        return Response.ok(servicos).build();
+    }
+
     @PUT
     @Path("/{id}")
     @Transactional
@@ -69,6 +79,7 @@ public class ServicoResource {
 
     @PUT
     @Path("/{id}/ativar")
+    @Transactional
     public Response ativar(@PathParam("id") Long id) {
 
         Servico servico = Servico.findById(id);
@@ -78,7 +89,6 @@ public class ServicoResource {
         }
 
         servico.statusServico = StatusServico.ATIVO;
-        servico.persist();
 
         return Response.ok(servico).build();
     }
